@@ -63,13 +63,13 @@ public class MuscleGroupControl : MonoBehaviour {
     }
 }
 
-
 public class MuscleBendSection
 {
     public GameObject Muscle { get; set; }
     public Transform TopPoint { get; set; }
     public Transform BottomPoint { get; set; }
 
+    private int weight = 100;
     private float distance = 0f;
     private GameObject muscleObj;
 
@@ -77,12 +77,22 @@ public class MuscleBendSection
     {
         this.muscleObj = this.Muscle.transform.Find("MuscleObj").gameObject;
         this.muscleObj.GetComponent<MeshRenderer>().enabled = true;
+        this.SetWeight();
     }
 
     public void FixedUpdate()
     {
         this.distance = Vector3.Distance(this.TopPoint.position, this.BottomPoint.position);
         this.UpdateMusclePosition();
+    }
+
+    private void SetWeight()
+    {
+        var topControl = this.TopPoint.gameObject.GetComponent<JointBendControl>();
+        var btmControl = this.BottomPoint.gameObject.GetComponent<JointBendControl>();
+        var top = (topControl != null) ? topControl.Weight : 100;
+        var btm = (btmControl != null) ? btmControl.Weight : 100;
+        this.weight = (int)((top + btm) / 2);
     }
 
     private void UpdateMusclePosition()
