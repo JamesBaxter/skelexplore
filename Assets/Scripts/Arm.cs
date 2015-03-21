@@ -13,6 +13,8 @@ public class Arm : MonoBehaviour
     private KinectSensor sensor;
     private BodyFrameReader reader;
     private Body[] data = null;
+    private ulong trackedBodyId = 0;
+    private int idx = -1;
 
     // Use this for initialization
     void Start()
@@ -50,22 +52,50 @@ public class Arm : MonoBehaviour
 
                 frame.Dispose();
                 frame = null;
+                
+                
 
-                int idx = -1;
-                for (int i = 0; i < this.sensor.BodyFrameSource.BodyCount; i++)
+                if (this.trackedBodyId == 0)
                 {
-                    if (this.data[i].IsTracked)
+
+                    for (int i = 0; i < this.sensor.BodyFrameSource.BodyCount; i++)
                     {
-                        idx = i;
+                        if (this.data[i].IsTracked)
+                        {
+                            idx = i;
+                            this.trackedBodyId = this.data[i].TrackingId;
+                        }
                     }
                 }
-                foreach (var armTransform in this.ArmObject)
+
+                if (idx > -1)
                 {
-                    this.UpdateObjectPosition(armTransform, this.data[idx].Joints);
+                    if (this.data[idx].TrackingId == trackedBodyId)
+                    {
+                        foreach (var armTransform in this.ArmObject)
+                        {
+                            this.UpdateObjectPosition(armTransform, this.data[idx].Joints);
+                            this.UpdateObjectRotation(armTransform, this.data[idx].JointOrientations);
+                        }
+                    }
                 }
             }
         }
 
+    }
+
+    private void UpdateObjectRotation(Transform gObject, Dictionary<JointType, Windows.Kinect.JointOrientation> joints)
+    {
+        JointOrientation jointOrientation = new Windows.Kinect.JointOrientation();
+        joints.TryGetValue(this.GetJointType(gObject.name), out jointOrientation);
+
+        var rotx = jointOrientation.Orientation.X;
+        var roty = jointOrientation.Orientation.Y;
+        var rotz = jointOrientation.Orientation.Z;
+
+   
+        gObject.rotation = Quaternion.Euler(rotx *10, roty *10, rotz*10);
+                        
     }
 
     private void UpdateObjectPosition(Transform gObject, Dictionary<JointType, Windows.Kinect.Joint> joints)
@@ -77,7 +107,10 @@ public class Arm : MonoBehaviour
         var posx = joint.Position.X;
         var posy = joint.Position.Y;
         var posz = joint.Position.Z;
-
+        var rotx = joint.Position.X;
+        var roty = joint.Position.Y;
+        var rotz = joint.Position.Z;
+        
         gObject.position = new Vector3(posx, posy, posz);
     }
 
