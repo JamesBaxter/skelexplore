@@ -5,6 +5,11 @@ public class MuscleControl : MonoBehaviour {
 
     public Transform TopPoint;
     public Transform BottomPoint;
+    public float EstimatedMax = 5;
+    public float EstimatedMin = 1;
+    public float MaxSize = 2;
+    public float MinSize = 0.1f;
+    
     private GameObject muscleObj;
     private float distance;
 
@@ -16,7 +21,8 @@ public class MuscleControl : MonoBehaviour {
 
 	public void FixedUpdate () 
     {
-        this.UpdateMusclePosition();   
+        this.distance = Vector3.Distance(this.TopPoint.position, this.BottomPoint.position);
+        this.UpdateMusclePosition();
 	}
 
     /// <summary>
@@ -29,14 +35,41 @@ public class MuscleControl : MonoBehaviour {
         this.transform.position = this.TopPoint.position;
         this.transform.LookAt(this.BottomPoint);
 
-        this.distance = Vector3.Distance(this.TopPoint.position, this.BottomPoint.position);
-
         // resize & re-position the child obj.
-        this.muscleObj.transform.localScale = new Vector3(
-            this.muscleObj.transform.localScale.x,
-            this.muscleObj.transform.localScale.y,
-            this.distance);
+        var muscleScale = this.GetMuscleSize();
+        this.muscleObj.transform.localScale = new Vector3(muscleScale, muscleScale, this.distance);
+        this.muscleObj.transform.localPosition = new Vector3(0f, 0f, this.distance / 2);
+    }
 
-        this.muscleObj.transform.localPosition = new Vector3(0, 0, this.distance / 2);
+    /// <summary>
+    /// This function will scale the size related to the distance
+    /// to mimic how a muscle works.
+    /// </summary>
+    private float GetMuscleSize()
+    {
+        if (this.distance >= this.EstimatedMax)
+        {
+            return this.MinSize;
+        }
+
+        else if (this.distance <= this.EstimatedMin)
+        {
+            return this.MaxSize;
+        }
+
+        var percentage = ((this.distance / (this.EstimatedMax - this.EstimatedMin)) - 1) * -1;
+        percentage = ((this.MaxSize - this.MinSize) * percentage) + this.MinSize;
+
+        Debug.Log(percentage);
+
+        if(percentage < this.MinSize){
+            return this.MinSize;
+        }
+
+        if(percentage > this.MaxSize){
+            return this.MaxSize;
+        }
+
+        return percentage;
     }
 }
