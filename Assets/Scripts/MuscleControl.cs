@@ -11,6 +11,7 @@ public class MuscleControl : MonoBehaviour {
     public void Start()
     {
         this.muscleObj = (GameObject)this.transform.Find("MuscleObj").gameObject;
+        this.muscleObj.GetComponent<MeshRenderer>().enabled = true;
     }
 
 	public void FixedUpdate () 
