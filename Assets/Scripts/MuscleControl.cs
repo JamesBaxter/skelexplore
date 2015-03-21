@@ -51,25 +51,23 @@ public class MuscleControl : MonoBehaviour {
         {
             return this.MinSize;
         }
-
         else if (this.distance <= this.EstimatedMin)
         {
             return this.MaxSize;
         }
 
-        var percentage = ((this.distance / (this.EstimatedMax - this.EstimatedMin)) - 1) * -1;
-        percentage = ((this.MaxSize - this.MinSize) * percentage) + this.MinSize;
+        var distancePercentage = ((this.distance / (this.EstimatedMax - this.EstimatedMin)) - 1) * -1;
+        var growthPercentage = ((this.MaxSize - this.MinSize) * distancePercentage) + this.MinSize;
 
-        Debug.Log(percentage);
-
-        if(percentage < this.MinSize){
+        if (growthPercentage < this.MinSize)
+        {
             return this.MinSize;
         }
-
-        if(percentage > this.MaxSize){
+        if (growthPercentage > this.MaxSize)
+        {
             return this.MaxSize;
         }
 
-        return percentage;
+        return growthPercentage;
     }
 }
