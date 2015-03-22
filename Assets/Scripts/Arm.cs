@@ -10,11 +10,15 @@ public class Arm : MonoBehaviour
 {
     public Transform[] ArmObject = new Transform[8];
 
+    public Transform Humerus;
+
     private KinectSensor sensor;
     private BodyFrameReader reader;
     private Body[] data = null;
     private ulong trackedBodyId = 0;
     private int idx = -1;
+
+    private GameObject humerus;
 
     // Use this for initialization
     void Start()
@@ -28,10 +32,12 @@ public class Arm : MonoBehaviour
             if (!this.sensor.IsOpen)
             {
                 this.sensor.Open();
+                this.humerus = (GameObject)Instantiate(Resources.Load("humerus"));
+
             }
         }
-   
-        
+
+
     }
 
     // Update is called once per frame
@@ -52,8 +58,8 @@ public class Arm : MonoBehaviour
 
                 frame.Dispose();
                 frame = null;
-                
-                
+
+
 
                 if (this.trackedBodyId == 0)
                 {
@@ -68,21 +74,36 @@ public class Arm : MonoBehaviour
                     }
                 }
 
-                if (idx > -1)
+                if (this.idx > -1)
                 {
-                    if (this.data[idx].TrackingId == trackedBodyId)
+                    if (this.data[this.idx].TrackingId == this.trackedBodyId)
                     {
                         foreach (var armTransform in this.ArmObject)
                         {
                             this.UpdateObjectPosition(armTransform, this.data[this.idx].Joints);
                             this.UpdateObjectRotation(armTransform, this.data[this.idx].JointOrientations);
+
                         }
+                        //this.DrawHumerus(this.data[this.idx]);
                     }
                 }
             }
         }
 
     }
+
+    private void DrawHumerus(Body body)
+    {
+        body.Joints.
+            var offset = end - start;
+        var scale = new Vector3(width, offset.magnitude / 2.0, width);
+        var position = start + (offset / 2.0);
+
+        var cylinder = Instantiate(cylinderPrefab, position, Quaternion.identity);
+        cylinder.transform.up = offset;
+        cylinder.transform.localScale = scale;
+    }
+    
 
     private void UpdateObjectRotation(Transform gObject, Dictionary<JointType, Windows.Kinect.JointOrientation> joints)
     {
@@ -93,24 +114,21 @@ public class Arm : MonoBehaviour
         var roty = jointOrientation.Orientation.Y;
         var rotz = jointOrientation.Orientation.Z;
 
-   
-        gObject.rotation = Quaternion.Euler(rotx *100, roty *100, rotz*100);
-                        
+
+        gObject.rotation = Quaternion.Euler(rotx * 100, roty * 100, rotz * 100);
+
     }
 
     private void UpdateObjectPosition(Transform gObject, Dictionary<JointType, Windows.Kinect.Joint> joints)
     {
         Windows.Kinect.Joint joint = new Windows.Kinect.Joint();
         joints.TryGetValue(this.GetJointType(gObject.name), out joint);
-        
+
         //var posTest = (joints[JointType].Position.X);
         var posx = joint.Position.X;
         var posy = joint.Position.Y;
         var posz = joint.Position.Z;
-        var rotx = joint.Position.X;
-        var roty = joint.Position.Y;
-        var rotz = joint.Position.Z;
-        
+
         gObject.position = new Vector3(posx, posy, posz);
     }
 
@@ -142,6 +160,7 @@ public class Arm : MonoBehaviour
         //Unreachable?
         return JointType.Head;
     }
+
     void OnApplicationQuit()
     {
         if (this.reader != null)
