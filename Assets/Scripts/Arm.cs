@@ -94,14 +94,14 @@ public class Arm : MonoBehaviour
 
     private void DrawHumerus(Body body)
     {
-        body.Joints.
-            var offset = end - start;
-        var scale = new Vector3(width, offset.magnitude / 2.0, width);
-        var position = start + (offset / 2.0);
+        //body.Joints.
+        //    var offset = end - start;
+        //var scale = new Vector3(width, offset.magnitude / 2.0, width);
+        //var position = start + (offset / 2.0);
 
-        var cylinder = Instantiate(cylinderPrefab, position, Quaternion.identity);
-        cylinder.transform.up = offset;
-        cylinder.transform.localScale = scale;
+        //var cylinder = Instantiate(cylinderPrefab, position, Quaternion.identity);
+        //cylinder.transform.up = offset;
+        //cylinder.transform.localScale = scale;
     }
     
 
