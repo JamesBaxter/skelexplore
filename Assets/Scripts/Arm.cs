@@ -8,7 +8,7 @@ using Windows.Kinect;
 
 public class Arm : MonoBehaviour
 {
-    public Transform[] ArmObject = new Transform[3];
+    public Transform[] ArmObject = new Transform[8];
 
     private KinectSensor sensor;
     private BodyFrameReader reader;
@@ -74,8 +74,8 @@ public class Arm : MonoBehaviour
                     {
                         foreach (var armTransform in this.ArmObject)
                         {
-                            this.UpdateObjectPosition(armTransform, this.data[idx].Joints);
-                            this.UpdateObjectRotation(armTransform, this.data[idx].JointOrientations);
+                            this.UpdateObjectPosition(armTransform, this.data[this.idx].Joints);
+                            this.UpdateObjectRotation(armTransform, this.data[this.idx].JointOrientations);
                         }
                     }
                 }
@@ -94,7 +94,7 @@ public class Arm : MonoBehaviour
         var rotz = jointOrientation.Orientation.Z;
 
    
-        gObject.rotation = Quaternion.Euler(rotx *10, roty *10, rotz*10);
+        gObject.rotation = Quaternion.Euler(rotx *100, roty *100, rotz*100);
                         
     }
 
@@ -124,7 +124,20 @@ public class Arm : MonoBehaviour
                 return JointType.ElbowRight;
             case "ShoulderRight":
                 return JointType.ShoulderRight;
-            
+            case "Head":
+                return JointType.Head;
+            case "HipLeft":
+                return JointType.HipLeft;
+            case "HipRight":
+                return JointType.HipRight;
+            case "SpineBase":
+                return JointType.SpineBase;
+            case "SpineMid":
+                return JointType.SpineMid;
+            case "SpineShoulder":
+                return JointType.SpineShoulder;
+
+
         }
         //Unreachable?
         return JointType.Head;
